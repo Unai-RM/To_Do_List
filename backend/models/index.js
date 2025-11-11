@@ -37,6 +37,35 @@ Object.keys(db).forEach(modelName => {
   }
 });
 
+// Definir relaciones entre modelos
+if (db.User && db.Group && db.UserGroup) {
+  // Relación many-to-many entre User y Group a través de UserGroup
+  db.User.belongsToMany(db.Group, {
+    through: db.UserGroup,
+    foreignKey: 'id_user',
+    otherKey: 'id_group',
+    as: 'groups'
+  });
+
+  db.Group.belongsToMany(db.User, {
+    through: db.UserGroup,
+    foreignKey: 'id_group',
+    otherKey: 'id_user',
+    as: 'users'
+  });
+
+  // Relación de Group con User (empresa que gestiona el grupo)
+  db.Group.belongsTo(db.User, {
+    foreignKey: 'id_company',
+    as: 'company'
+  });
+
+  db.User.hasMany(db.Group, {
+    foreignKey: 'id_company',
+    as: 'managedGroups'
+  });
+}
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

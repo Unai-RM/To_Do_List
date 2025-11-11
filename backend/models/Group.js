@@ -1,32 +1,22 @@
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const Group = sequelize.define('Group', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    nick: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-      unique: true
-    },
-    password: {
-      type: DataTypes.STRING(255),
-      allowNull: false
-    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    surname: {
-      type: DataTypes.STRING(100),
-      allowNull: false
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
-    role: {
+    id_company: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 3,
-      comment: '0=superadmin, 1=empresa, 2=gestor, 3=usuario'
+      allowNull: true,
+      comment: 'ID del usuario empresa que gestiona este grupo'
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -39,10 +29,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: DataTypes.NOW
     }
   }, {
-    tableName: 'users',
+    tableName: 'groups',
     timestamps: true,
     underscored: false
   });
 
-  return User;
+  return Group;
 };

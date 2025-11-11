@@ -30,9 +30,13 @@ To_Do_List/
 ## 🗄️ Base de Datos
 
 ### Tablas:
-- **users**: Usuarios del sistema (id, nick, password, name, surname)
+- **users**: Usuarios del sistema (id, nick, password, name, surname, role)
+  - **role**: 0=superadmin, 1=empresa, 2=gestor, 3=usuario (por defecto)
 - **tasks**: Tareas (id, title, description, status, id_user_creator)
 - **task_users**: Relación many-to-many entre tareas y usuarios
+- **groups**: Agrupaciones de usuarios (id, name, description, id_company)
+  - **id_company**: Usuario con rol empresa que gestiona el grupo
+- **user_groups**: Relación many-to-many entre usuarios y grupos
 
 ## 🚀 Instalación
 
@@ -62,7 +66,17 @@ CREATE DATABASE todolist_db;
 npx sequelize-cli db:migrate
 ```
 
-### 5. Configurar Frontend
+### 5. Ejecutar seeders (crear superadmin)
+
+```bash
+npx sequelize-cli db:seed:all
+```
+
+**Credenciales del superadmin:**
+- Usuario: `superadmin`
+- Contraseña: `admin123`
+
+### 6. Configurar Frontend
 
 ```bash
 cd ../frontend
@@ -87,7 +101,10 @@ Abre tu navegador en: `http://localhost:4200`
 
 ## ✨ Funcionalidades Implementadas
 
-- ✅ **Autenticación**: Registro, login y logout con JWT y encriptación de contraseñas
+- ✅ **Autenticación**: Login y logout con JWT y encriptación de contraseñas
+- ✅ **Sistema de roles**: Superadmin (0), Empresa (1), Gestor (2), Usuario (3)
+- ✅ **Gestión centralizada**: Registro de usuarios solo por superadmin
+- ✅ **Agrupaciones de usuarios**: Sistema de grupos con relación many-to-many
 - ✅ **Tablero Kanban**: 5 columnas de estado (Backlog, To Do, Doing, Testing, Done)
 - ✅ **Gestión de tareas**: Crear, editar y mover tareas con drag & drop
 - ✅ **Filtrado por usuario**: Cada usuario ve solo sus propias tareas
@@ -96,15 +113,10 @@ Abre tu navegador en: `http://localhost:4200`
 
 ## 🚧 Funcionalidades Pendientes
 
+- [ ] **Panel de administración**: CRUD de usuarios y grupos (solo superadmin y empresa)
 - [ ] **Asignar usuarios a tareas**: Compartir tareas entre múltiples usuarios
+- [ ] **Gestión de grupos**: Asignar usuarios a grupos
+- [ ] **Permisos por rol**: Restricciones según el rol del usuario
 - [ ] **Eliminar tareas**: Botón y endpoint para eliminar
 - [ ] **Diseño responsive**: Adaptar para móviles y tablets
 - [ ] **Mejoras de estilo**: Tema oscuro/claro, notificaciones toast, animaciones mejoradas
-
-### Estructura de Estados de Tareas
-Los estados se manejan como números enteros:
-- `0` = Backlog
-- `1` = To Do
-- `2` = Doing
-- `3` = Testing
-- `4` = Done
