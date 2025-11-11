@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         this.authService.saveToken(response.token);
         this.authService.saveUser(response.user);
-        this.router.navigate(['/']);
+        this.router.navigate(['/kanban']);
       },
       error: (error) => {
         this.loading = false;

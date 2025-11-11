@@ -1,0 +1,27 @@
+<div class="kanban-container">
+  <div class="kanban-header">
+    <h1>Tablero Kanban</h1>
+    <button class="btn-add-task">
+      + Nueva Tarea
+    </button>
+  </div>
+
+  <div class="kanban-board">
+    <div 
+      *ngFor="let column of columns" 
+      class="kanban-column"
+      [attr.data-status]="column.status"
+    >
+      <div class="column-header">
+        <h2>{{ column.name }}</h2>
+        <span class="task-count">{{ column.tasks.length }}</span>
+      </div>
+
+      <div class="task-list">
+        <div *ngIf="column.tasks.length === 0" class="empty-column">
+          Sin tareas
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
