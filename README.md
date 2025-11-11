@@ -85,6 +85,26 @@ npm start
 
 Abre tu navegador en: `http://localhost:4200`
 
-## 📝 Estado del Proyecto
+## ✨ Funcionalidades Implementadas
 
-🔨 En desarrollo inicial
+- ✅ **Autenticación**: Registro, login y logout con JWT y encriptación de contraseñas
+- ✅ **Tablero Kanban**: 5 columnas de estado (Backlog, To Do, Doing, Testing, Done)
+- ✅ **Gestión de tareas**: Crear, editar y mover tareas con drag & drop
+- ✅ **Filtrado por usuario**: Cada usuario ve solo sus propias tareas
+- ✅ **Interfaz moderna**: Diseño con gradientes, modales animados y validaciones reactivas
+- ✅ **API REST completa**: Endpoints para autenticación y gestión de tareas
+
+## 🚧 Funcionalidades Pendientes
+
+- [ ] **Asignar usuarios a tareas**: Compartir tareas entre múltiples usuarios
+- [ ] **Eliminar tareas**: Botón y endpoint para eliminar
+- [ ] **Diseño responsive**: Adaptar para móviles y tablets
+- [ ] **Mejoras de estilo**: Tema oscuro/claro, notificaciones toast, animaciones mejoradas
+
+### Estructura de Estados de Tareas
+Los estados se manejan como números enteros:
+- `0` = Backlog
+- `1` = To Do
+- `2` = Doing
+- `3` = Testing
+- `4` = Done

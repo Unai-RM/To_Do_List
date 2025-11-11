@@ -14,9 +14,9 @@
     </div>
   </div>
 
-  <div class="kanban-board">
+  <div class="kanban-board" cdkDropListGroup>
     <div 
-      *ngFor="let column of columns" 
+      *ngFor="let column of columns; let i = index" 
       class="kanban-column"
       [attr.data-status]="column.status"
     >
@@ -25,8 +25,20 @@
         <span class="task-count">{{ column.tasks.length }}</span>
       </div>
 
-      <div class="task-list">
-        <div *ngFor="let task of column.tasks" class="task-card">
+      <div 
+        class="task-list"
+        cdkDropList
+        [id]="'column-' + i"
+        [cdkDropListData]="column.tasks"
+        [cdkDropListConnectedTo]="getColumnIds()"
+        (cdkDropListDropped)="drop($event, column)"
+      >
+        <div 
+          *ngFor="let task of column.tasks" 
+          class="task-card"
+          cdkDrag
+          (click)="openEditModal(task)"
+        >
           <div class="task-header">
             <h3>{{ task.title }}</h3>
           </div>
@@ -94,6 +106,62 @@
           [disabled]="taskForm.invalid || loading"
         >
           {{ loading ? 'Creando...' : 'Crear Tarea' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para editar tarea -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Tarea</h2>
+      <button class="btn-close" (click)="closeEditModal()">×</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
+      <div class="form-group">
+        <label for="editTitle">Título *</label>
+        <input 
+          type="text" 
+          id="editTitle" 
+          formControlName="title" 
+          class="form-control"
+          [class.invalid]="editTitle?.invalid && editTitle?.touched"
+          placeholder="Título de la tarea"
+        >
+        <div *ngIf="editTitle?.invalid && editTitle?.touched" class="error-message">
+          <span *ngIf="editTitle?.errors?.['required']">El título es requerido</span>
+          <span *ngIf="editTitle?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="editDescription">Descripción</label>
+        <textarea 
+          id="editDescription" 
+          formControlName="description" 
+          class="form-control"
+          rows="4"
+          placeholder="Descripción de la tarea (opcional)"
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeEditModal()">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="editForm.invalid || loading"
+        >
+          {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
       </div>
     </form>

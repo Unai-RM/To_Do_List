@@ -28,4 +28,14 @@ export class TaskService {
   createTask(task: Partial<Task>): Observable<Task> {
     return this.http.post<Task>(this.apiUrl, task, { headers: this.getHeaders() });
   }
+
+  // Actualizar tarea completa
+  updateTask(id: number, task: Partial<Task>): Observable<Task> {
+    return this.http.put<Task>(`${this.apiUrl}/${id}`, task, { headers: this.getHeaders() });
+  }
+
+  // Actualizar solo el estado de la tarea
+  updateTaskStatus(id: number, status: TaskStatus): Observable<Task> {
+    return this.http.patch<Task>(`${this.apiUrl}/${id}/status`, { status }, { headers: this.getHeaders() });
+  }
 }

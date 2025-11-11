@@ -61,6 +61,61 @@ const taskController = {
         error: error.message 
       });
     }
+  },
+
+  // Actualizar tarea completa
+  async updateTask(req, res) {
+    try {
+      const { id } = req.params;
+      const { title, description } = req.body;
+
+      const task = await Task.findByPk(id);
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      if (title !== undefined) task.title = title;
+      if (description !== undefined) task.description = description;
+      task.updatedAt = new Date();
+
+      await task.save();
+      res.json(task);
+    } catch (error) {
+      console.error('Error al actualizar tarea:', error);
+      res.status(500).json({ 
+        message: 'Error al actualizar la tarea',
+        error: error.message 
+      });
+    }
+  },
+
+  // Actualizar solo el estado de la tarea
+  async updateTaskStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (status === undefined) {
+        return res.status(400).json({ message: 'El estado es requerido' });
+      }
+
+      const task = await Task.findByPk(id);
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      task.status = status;
+      task.updatedAt = new Date();
+      await task.save();
+
+      res.json(task);
+    } catch (error) {
+      console.error('Error al actualizar estado:', error);
+      res.status(500).json({ 
+        message: 'Error al actualizar el estado de la tarea',
+        error: error.message 
+      });
+    }
   }
 };
 
