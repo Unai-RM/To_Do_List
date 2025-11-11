@@ -19,9 +19,10 @@ module.exports = {
         allowNull: true
       },
       status: {
-        type: Sequelize.ENUM('pending', 'in_progress', 'completed'),
+        type: Sequelize.INTEGER,
         allowNull: false,
-        defaultValue: 'pending'
+        defaultValue: 0,
+        comment: '0=Backlog, 1=ToDo, 2=Doing, 3=Testing, 4=Done'
       },
       id_user_creator: {
         type: Sequelize.INTEGER,

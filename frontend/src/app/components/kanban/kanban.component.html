@@ -1,9 +1,17 @@
 <div class="kanban-container">
   <div class="kanban-header">
     <h1>Tablero Kanban</h1>
-    <button class="btn-add-task">
-      + Nueva Tarea
-    </button>
+    <div class="header-actions">
+      <div class="user-info">
+        <span class="user-name">{{ currentUser?.name }} {{ currentUser?.surname }}</span>
+        <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
+          Cerrar sesión
+        </button>
+      </div>
+      <button class="btn-add-task" (click)="openModal()">
+        + Nueva Tarea
+      </button>
+    </div>
   </div>
 
   <div class="kanban-board">
@@ -18,10 +26,76 @@
       </div>
 
       <div class="task-list">
+        <div *ngFor="let task of column.tasks" class="task-card">
+          <div class="task-header">
+            <h3>{{ task.title }}</h3>
+          </div>
+          <p *ngIf="task.description" class="task-description">{{ task.description }}</p>
+          <div class="task-footer">
+            <span class="task-id">#{{ task.id }}</span>
+          </div>
+        </div>
+
         <div *ngIf="column.tasks.length === 0" class="empty-column">
           Sin tareas
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Modal para crear tarea -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Nueva Tarea</h2>
+      <button class="btn-close" (click)="closeModal()">×</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="title">Título *</label>
+        <input 
+          type="text" 
+          id="title" 
+          formControlName="title" 
+          class="form-control"
+          [class.invalid]="title?.invalid && title?.touched"
+          placeholder="Título de la tarea"
+        >
+        <div *ngIf="title?.invalid && title?.touched" class="error-message">
+          <span *ngIf="title?.errors?.['required']">El título es requerido</span>
+          <span *ngIf="title?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descripción</label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          class="form-control"
+          rows="4"
+          placeholder="Descripción de la tarea (opcional)"
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="taskForm.invalid || loading"
+        >
+          {{ loading ? 'Creando...' : 'Crear Tarea' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>
