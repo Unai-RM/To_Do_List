@@ -1,0 +1,252 @@
+<div class="users-container">
+  <div class="page-header">
+    <h1>{{ pageTitle }}</h1>
+    <button class="btn-add" (click)="openModal()">
+      <span class="btn-icon">+</span>
+      {{ currentUser?.role === 0 ? 'Nueva Empresa' : 'Nuevo Usuario' }}
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="content-wrapper">
+    <div *ngIf="loading && users.length === 0" class="loading-state">
+      <p>Cargando...</p>
+    </div>
+
+    <table *ngIf="!loading || users.length > 0" class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th *ngIf="currentUser?.role === 0">Empresa</th>
+          <th>Nick</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Rol</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of paginatedUsers">
+          <td>{{ user.id }}</td>
+          <td *ngIf="currentUser?.role === 0">
+            <span class="company-name">{{ user.company_display || 'N/A' }}</span>
+          </td>
+          <td>{{ user.nick }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.surname }}</td>
+          <td>
+            <span class="badge" [class.badge-empresa]="user.role === 1">
+              {{ getRoleName(user.role) }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn-action btn-edit" (click)="openEditModal(user)" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-action btn-delete" (click)="openDeleteModal(user)" title="Eliminar">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0 && !loading">
+          <td [attr.colspan]="currentUser?.role === 0 ? 7 : 6" class="empty-state">
+            No hay {{ currentUser?.role === 0 ? 'empresas' : 'usuarios' }} registrados
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td [attr.colspan]="currentUser?.role === 0 ? 7 : 6" class="table-footer">
+            <div class="footer-content">
+              <div class="total-count">
+                Total: {{ users.length }} {{ currentUser?.role === 0 ? (users.length === 1 ? 'empresa' : 'empresas') : (users.length === 1 ? 'usuario' : 'usuarios') }}
+              </div>
+              <div class="pagination-controls" *ngIf="users.length > 0">
+                <div class="items-per-page">
+                  <label for="itemsPerPage">Mostrar:</label>
+                  <select 
+                    id="itemsPerPage" 
+                    [value]="itemsPerPage" 
+                    (change)="onItemsPerPageChange($event)"
+                    class="items-select"
+                  >
+                    <option *ngFor="let option of itemsPerPageOptions" [value]="option">
+                      {{ option }}
+                    </option>
+                  </select>
+                </div>
+                <div class="pagination">
+                  <button 
+                    class="pagination-btn" 
+                    (click)="previousPage()" 
+                    [disabled]="currentPage === 1"
+                    title="Página anterior"
+                  >
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  
+                  <span class="page-info">
+                    Página {{ currentPage }} de {{ totalPages }}
+                  </span>
+                  
+                  <button 
+                    class="pagination-btn" 
+                    (click)="nextPage()" 
+                    [disabled]="currentPage === totalPages"
+                    title="Página siguiente"
+                  >
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para crear/editar usuario -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editingUser ? 'Editar' : 'Nueva' }} {{ currentUser?.role === 0 ? 'Empresa' : 'Usuario' }}</h3>
+      <button class="btn-close" (click)="closeModal()">×</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="nick">Nick de usuario *</label>
+        <input 
+          type="text" 
+          id="nick" 
+          formControlName="nick" 
+          class="form-control"
+          [class.invalid]="nick?.invalid && nick?.touched"
+          placeholder="Nombre de usuario único"
+        >
+        <div *ngIf="nick?.invalid && nick?.touched" class="error-message">
+          <span *ngIf="nick?.errors?.['required']">El nick es requerido</span>
+          <span *ngIf="nick?.errors?.['minlength']">Mínimo 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="name">Nombre *</label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          class="form-control"
+          [class.invalid]="name?.invalid && name?.touched"
+          placeholder="Nombre"
+        >
+        <div *ngIf="name?.invalid && name?.touched" class="error-message">
+          <span *ngIf="name?.errors?.['required']">El nombre es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="surname">Apellido *</label>
+        <input 
+          type="text" 
+          id="surname" 
+          formControlName="surname" 
+          class="form-control"
+          [class.invalid]="surname?.invalid && surname?.touched"
+          placeholder="Apellido"
+        >
+        <div *ngIf="surname?.invalid && surname?.touched" class="error-message">
+          <span *ngIf="surname?.errors?.['required']">El apellido es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="currentUser?.role === 0">
+        <label for="companyName">Nombre de la Empresa {{ editingUser ? '' : '*' }}</label>
+        <input 
+          type="text" 
+          id="companyName" 
+          formControlName="company_name" 
+          class="form-control"
+          [class.invalid]="company_name?.invalid && company_name?.touched"
+          placeholder="Nombre comercial de la empresa"
+        >
+        <div *ngIf="company_name?.invalid && company_name?.touched" class="error-message">
+          <span *ngIf="company_name?.errors?.['required']">El nombre de la empresa es requerido</span>
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group" *ngIf="currentUser?.role === 1 || currentUser?.role === 2">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            formControlName="is_manager"
+            class="checkbox-input"
+          >
+          <span class="checkbox-text">Este usuario es gestor</span>
+        </label>
+        <p class="checkbox-help">Los gestores pueden crear y gestionar usuarios</p>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña {{ editingUser ? '(dejar vacío para no cambiar)' : '*' }}</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          class="form-control"
+          [class.invalid]="password?.invalid && password?.touched"
+          placeholder="Contraseña"
+        >
+        <div *ngIf="password?.invalid && password?.touched" class="error-message">
+          <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
+          <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="closeModal()">
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="userForm.invalid || loading"
+        >
+          {{ loading ? 'Guardando...' : (editingUser ? 'Actualizar' : 'Crear') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirmar Eliminación</h3>
+    </div>
+    
+    <div class="modal-body">
+      <p>¿Estás seguro de que deseas eliminar a <strong>{{ userToDelete?.name }} {{ userToDelete?.surname }}</strong>?</p>
+      <p class="text-muted">Esta acción no se puede deshacer.</p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">
+        Cancelar
+      </button>
+      <button class="btn-danger" (click)="confirmDelete()" [disabled]="loading">
+        {{ loading ? 'Eliminando...' : 'Eliminar' }}
+      </button>
+    </div>
+  </div>
+</div>

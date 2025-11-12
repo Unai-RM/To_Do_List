@@ -2,12 +2,6 @@
   <div class="kanban-header">
     <h1>Tablero Kanban</h1>
     <div class="header-actions">
-      <div class="user-info">
-        <span class="user-name">{{ currentUser?.name }} {{ currentUser?.surname }}</span>
-        <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
-          Cerrar sesión
-        </button>
-      </div>
       <button class="btn-add-task" (click)="openModal()">
         + Nueva Tarea
       </button>

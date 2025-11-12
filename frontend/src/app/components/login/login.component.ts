@@ -39,7 +39,16 @@ export class LoginComponent implements OnInit {
         this.loading = false;
         this.authService.saveToken(response.token);
         this.authService.saveUser(response.user);
-        this.router.navigate(['/kanban']);
+        
+        // Redirigir según el rol del usuario
+        const userRole = response.user.role;
+        if (userRole === 0) {
+          // Superadmin va a usuarios
+          this.router.navigate(['/users']);
+        } else {
+          // Empresa, gestor y usuario van a kanban
+          this.router.navigate(['/kanban']);
+        }
       },
       error: (error) => {
         this.loading = false;

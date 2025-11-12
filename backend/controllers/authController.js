@@ -42,7 +42,8 @@ const authController = {
           id: newUser.id,
           nick: newUser.nick,
           name: newUser.name,
-          surname: newUser.surname
+          surname: newUser.surname,
+          role: newUser.role
         }
       });
     } catch (error) {
@@ -92,7 +93,8 @@ const authController = {
           id: user.id,
           nick: user.nick,
           name: user.name,
-          surname: user.surname
+          surname: user.surname,
+          role: user.role
         }
       });
     } catch (error) {

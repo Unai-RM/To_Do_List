@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 3,
       comment: '0=superadmin, 1=empresa, 2=gestor, 3=usuario'
     },
+    id_company: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      comment: 'ID of the company the user belongs to'
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

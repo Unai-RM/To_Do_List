@@ -8,12 +8,20 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { KanbanComponent } from './components/kanban/kanban.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { UsersComponent } from './components/users/users.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { LayoutComponent } from './components/layout/layout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    KanbanComponent
+    KanbanComponent,
+    SidebarComponent,
+    UsersComponent,
+    SettingsComponent,
+    LayoutComponent
   ],
   imports: [
     BrowserModule,

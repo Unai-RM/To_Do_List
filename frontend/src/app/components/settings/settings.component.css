@@ -1,0 +1,52 @@
+.settings-container {
+  padding: 40px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.page-header {
+  margin-bottom: 40px;
+}
+
+.page-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.page-header p {
+  margin: 0;
+  font-size: 16px;
+  color: #718096;
+}
+
+.content-placeholder {
+  background: white;
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.content-placeholder h2 {
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  color: #2d3748;
+}
+
+.content-placeholder p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #4a5568;
+}
+
+.text-muted {
+  color: #a0aec0 !important;
+  font-style: italic;
+}

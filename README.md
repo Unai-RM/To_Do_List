@@ -103,20 +103,29 @@ Abre tu navegador en: `http://localhost:4200`
 
 - ✅ **Autenticación**: Login y logout con JWT y encriptación de contraseñas
 - ✅ **Sistema de roles**: Superadmin (0), Empresa (1), Gestor (2), Usuario (3)
+- ✅ **Menú lateral dinámico**: Navegación basada en permisos por rol
 - ✅ **Gestión centralizada**: Registro de usuarios solo por superadmin
 - ✅ **Agrupaciones de usuarios**: Sistema de grupos con relación many-to-many
-- ✅ **Tablero Kanban**: 5 columnas de estado (Backlog, To Do, Doing, Testing, Done)
+- ✅ **Tablero Kanban**: 5 columnas de estado (para empresa y gestor)
 - ✅ **Gestión de tareas**: Crear, editar y mover tareas con drag & drop
 - ✅ **Filtrado por usuario**: Cada usuario ve solo sus propias tareas
+- ✅ **Modal de confirmación**: Confirmación antes de cerrar sesión
 - ✅ **Interfaz moderna**: Diseño con gradientes, modales animados y validaciones reactivas
 - ✅ **API REST completa**: Endpoints para autenticación y gestión de tareas
+- ✅ **Paginación de datatable**: Sistema de paginación con navegación y selector de items por página (5, 10, 25, 50, 100)
+
+### Accesos por Rol:
+- **Superadmin (0)**: Usuarios, Configuración (sin Kanban)
+- **Empresa (1)**: Kanban, Usuarios, Configuración
+- **Gestor (2)**: Kanban, Usuarios, Configuración
+- **Usuario (3)**: Kanban, Configuración (sin Usuarios)
 
 ## 🚧 Funcionalidades Pendientes
 
-- [ ] **Panel de administración**: CRUD de usuarios y grupos (solo superadmin y empresa)
 - [ ] **Asignar usuarios a tareas**: Compartir tareas entre múltiples usuarios
-- [ ] **Gestión de grupos**: Asignar usuarios a grupos
-- [ ] **Permisos por rol**: Restricciones según el rol del usuario
+- [ ] **Gestión de grupos**: Panel para asignar usuarios a grupos
 - [ ] **Eliminar tareas**: Botón y endpoint para eliminar
 - [ ] **Diseño responsive**: Adaptar para móviles y tablets
 - [ ] **Mejoras de estilo**: Tema oscuro/claro, notificaciones toast, animaciones mejoradas
+- [ ] **Búsqueda y filtros**: Filtrar usuarios/tareas por diferentes criterios
+- [ ] **Exportación de datos**: Exportar listados a CSV/Excel

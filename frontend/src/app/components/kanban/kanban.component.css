@@ -27,51 +27,25 @@
   gap: 20px;
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-right: 20px;
-  border-right: 1px solid #e0e0e0;
-}
-
-.user-name {
-  color: #333;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.btn-logout {
-  padding: 8px 16px;
-  background-color: #f0f0f0;
-  color: #666;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-logout:hover {
-  background-color: #f5576c;
-  color: white;
-}
-
 .btn-add-task {
   padding: 12px 24px;
-  background-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-add-task:hover {
-  background-color: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .new-task-form {
@@ -138,13 +112,14 @@
 
 .kanban-board {
   display: flex;
-  gap: 20px;
+  gap: 18px;
   overflow-x: auto;
   padding-bottom: 20px;
 }
 
 .kanban-column {
-  flex: 0 0 300px;
+  flex: 1;
+  min-width: 290px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
   padding: 15px;

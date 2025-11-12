@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,9 @@ app.use('/api/auth', authRoutes);
 
 // Rutas de tareas
 app.use('/api/tasks', taskRoutes);
+
+// Rutas de usuarios
+app.use('/api/users', userRoutes);
 
 // Iniciar servidor
 app.listen(PORT, () => {

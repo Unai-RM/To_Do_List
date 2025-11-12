@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { TaskService } from '../../services/task.service';
 import { Task, TaskStatus, TaskColumn } from '../../models/task.model';
@@ -32,8 +31,7 @@ export class KanbanComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
-    private authService: AuthService,
-    private router: Router
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -212,11 +210,6 @@ export class KanbanComponent implements OnInit {
 
   getColumnIds(): string[] {
     return this.columns.map((_, index) => `column-${index}`);
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 
   get title() { return this.taskForm.get('title'); }

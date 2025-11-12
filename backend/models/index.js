@@ -66,6 +66,32 @@ if (db.User && db.Group && db.UserGroup) {
   });
 }
 
+// Relaciones con Company
+if (db.User && db.Company) {
+  // Un usuario (empresa) tiene una compañía
+  db.User.hasOne(db.Company, {
+    foreignKey: 'user_id',
+    as: 'company'
+  });
+
+  // Una compañía pertenece a un usuario
+  db.Company.belongsTo(db.User, {
+    foreignKey: 'user_id',
+    as: 'owner'
+  });
+
+  // Usuarios pertenecen a una compañía
+  db.User.belongsTo(db.Company, {
+    foreignKey: 'id_company',
+    as: 'userCompany'
+  });
+
+  db.Company.hasMany(db.User, {
+    foreignKey: 'id_company',
+    as: 'employees'
+  });
+}
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
