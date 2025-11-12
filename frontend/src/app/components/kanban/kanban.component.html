@@ -135,6 +135,12 @@
             <button class="btn-action btn-edit" (click)="openEditModal(task)" title="Editar">
               <i class="fas fa-edit"></i>
             </button>
+            <button class="btn-action btn-archive" (click)="onArchiveTask(task)" title="Archivar">
+              <i class="fas fa-archive"></i>
+            </button>
+            <button class="btn-action btn-delete" (click)="onDeleteTask(task)" title="Eliminar">
+              <i class="fas fa-trash"></i>
+            </button>
           </td>
         </tr>
         <tr *ngIf="allTasks.length === 0">
@@ -379,6 +385,23 @@
         </div>
       </div>
 
+      <div class="task-actions-section" *ngIf="editingTask">
+        <button 
+          type="button" 
+          class="btn-task-action btn-task-archive" 
+          (click)="onArchiveTaskFromSidebar()"
+        >
+          Archivar <i class="fas fa-archive"></i>
+        </button>
+        <button 
+          type="button" 
+          class="btn-task-action btn-task-delete" 
+          (click)="onDeleteTaskFromSidebar()"
+        >
+          Eliminar <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
       <div class="sidebar-footer">
         <button type="button" class="btn-cancel" (click)="closeEditModal()">
           <i class="fas fa-times"></i> Cancelar
@@ -392,5 +415,31 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="confirm-overlay" *ngIf="showConfirmModal" (click)="cancelConfirm()">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-header">
+      <i class="fas" [ngClass]="confirmAction === 'archive' ? 'fa-archive' : 'fa-trash'"></i>
+      <h3>{{ confirmAction === 'archive' ? 'Archivar Tarea' : 'Eliminar Tarea' }}</h3>
+    </div>
+    <div class="confirm-body">
+      <p>{{ confirmMessage }}</p>
+    </div>
+    <div class="confirm-footer">
+      <button type="button" class="btn-confirm-cancel" (click)="cancelConfirm()">
+        Cancelar
+      </button>
+      <button 
+        type="button" 
+        class="btn-confirm-action"
+        [ngClass]="confirmAction === 'archive' ? 'btn-confirm-archive' : 'btn-confirm-delete'"
+        (click)="executeConfirm()"
+      >
+        {{ confirmAction === 'archive' ? 'Archivar' : 'Eliminar' }}
+      </button>
+    </div>
   </div>
 </div>

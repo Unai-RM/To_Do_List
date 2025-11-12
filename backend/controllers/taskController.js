@@ -31,20 +31,22 @@ const taskController = {
         
         const companyUserIds = companyUsers.map(u => u.id);
         
-        // Obtener todas las tareas creadas por usuarios de la empresa
+        // Obtener todas las tareas creadas por usuarios de la empresa (no archivadas)
         tasks = await Task.findAll({
           where: {
             id_user_creator: {
               [Sequelize.Op.in]: companyUserIds
-            }
+            },
+            archived: false
           },
           order: [['createdAt', 'DESC']]
         });
       } else {
-        // Para usuarios normales, solo sus tareas
+        // Para usuarios normales, solo sus tareas (no archivadas)
         tasks = await Task.findAll({
           where: {
-            id_user_creator: userId
+            id_user_creator: userId,
+            archived: false
           },
           order: [['createdAt', 'DESC']]
         });
@@ -218,6 +220,76 @@ const taskController = {
       console.error('Error al actualizar usuarios:', error);
       res.status(500).json({ 
         message: 'Error al actualizar usuarios asignados',
+        error: error.message 
+      });
+    }
+  },
+
+  // Archivar tarea
+  async archiveTask(req, res) {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findByPk(id);
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      task.archived = true;
+      task.updatedAt = new Date();
+      await task.save();
+
+      res.json({ message: 'Tarea archivada correctamente', task });
+    } catch (error) {
+      console.error('Error al archivar tarea:', error);
+      res.status(500).json({ 
+        message: 'Error al archivar la tarea',
+        error: error.message 
+      });
+    }
+  },
+
+  // Desarchivar tarea
+  async unarchiveTask(req, res) {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findByPk(id);
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      task.archived = false;
+      task.updatedAt = new Date();
+      await task.save();
+
+      res.json({ message: 'Tarea desarchivada correctamente', task });
+    } catch (error) {
+      console.error('Error al desarchivar tarea:', error);
+      res.status(500).json({ 
+        message: 'Error al desarchivar la tarea',
+        error: error.message 
+      });
+    }
+  },
+
+  // Eliminar tarea (soft delete)
+  async deleteTask(req, res) {
+    try {
+      const { id } = req.params;
+
+      const task = await Task.findByPk(id);
+      if (!task) {
+        return res.status(404).json({ message: 'Tarea no encontrada' });
+      }
+
+      await task.destroy(); // Soft delete gracias a paranoid: true
+
+      res.json({ message: 'Tarea eliminada correctamente' });
+    } catch (error) {
+      console.error('Error al eliminar tarea:', error);
+      res.status(500).json({ 
+        message: 'Error al eliminar la tarea',
         error: error.message 
       });
     }

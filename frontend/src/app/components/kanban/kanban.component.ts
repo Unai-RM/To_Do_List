@@ -42,6 +42,12 @@ export class KanbanComponent implements OnInit {
   availableUsers: any[] = [];
   allCompanyUsers: any[] = [];
 
+  // Modal de confirmación
+  showConfirmModal: boolean = false;
+  confirmMessage: string = '';
+  confirmAction: 'archive' | 'delete' = 'archive';
+  confirmCallback: (() => void) | null = null;
+
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
@@ -441,7 +447,118 @@ export class KanbanComponent implements OnInit {
   getInitials(name: string, surname: string): string {
     const firstInitial = name ? name.charAt(0).toUpperCase() : '';
     const lastInitial = surname ? surname.charAt(0).toUpperCase() : '';
-    return firstInitial + lastInitial;
+    return `${firstInitial}${lastInitial}`;
+  }
+
+  onArchiveTask(task: Task): void {
+    this.showConfirm(
+      `¿Estás seguro de que deseas archivar la tarea "${task.title}"?`,
+      'archive',
+      () => {
+        this.taskService.archiveTask(task.id).subscribe({
+          next: () => {
+            this.removeTaskFromView(task.id);
+          },
+          error: (error: any) => {
+            console.error('Error al archivar tarea:', error);
+            alert('Error al archivar la tarea');
+          }
+        });
+      }
+    );
+  }
+
+  onDeleteTask(task: Task): void {
+    this.showConfirm(
+      `¿Estás seguro de que deseas eliminar la tarea "${task.title}"? Esta acción no se puede deshacer.`,
+      'delete',
+      () => {
+        this.taskService.deleteTask(task.id).subscribe({
+          next: () => {
+            this.removeTaskFromView(task.id);
+          },
+          error: (error: any) => {
+            console.error('Error al eliminar tarea:', error);
+            alert('Error al eliminar la tarea');
+          }
+        });
+      }
+    );
+  }
+
+  onArchiveTaskFromSidebar(): void {
+    if (this.editingTask) {
+      this.showConfirm(
+        `¿Estás seguro de que deseas archivar la tarea "${this.editingTask.title}"?`,
+        'archive',
+        () => {
+          this.taskService.archiveTask(this.editingTask!.id).subscribe({
+            next: () => {
+              this.removeTaskFromView(this.editingTask!.id);
+              this.closeEditModal();
+            },
+            error: (error: any) => {
+              console.error('Error al archivar tarea:', error);
+              alert('Error al archivar la tarea');
+            }
+          });
+        }
+      );
+    }
+  }
+
+  onDeleteTaskFromSidebar(): void {
+    if (this.editingTask) {
+      this.showConfirm(
+        `¿Estás seguro de que deseas eliminar la tarea "${this.editingTask.title}"? Esta acción no se puede deshacer.`,
+        'delete',
+        () => {
+          this.taskService.deleteTask(this.editingTask!.id).subscribe({
+            next: () => {
+              this.removeTaskFromView(this.editingTask!.id);
+              this.closeEditModal();
+            },
+            error: (error: any) => {
+              console.error('Error al eliminar tarea:', error);
+              alert('Error al eliminar la tarea');
+            }
+          });
+        }
+      );
+    }
+  }
+
+  showConfirm(message: string, action: 'archive' | 'delete', callback: () => void): void {
+    this.confirmMessage = message;
+    this.confirmAction = action;
+    this.confirmCallback = callback;
+    this.showConfirmModal = true;
+  }
+
+  executeConfirm(): void {
+    if (this.confirmCallback) {
+      this.confirmCallback();
+    }
+    this.cancelConfirm();
+  }
+
+  cancelConfirm(): void {
+    this.showConfirmModal = false;
+    this.confirmMessage = '';
+    this.confirmCallback = null;
+  }
+
+  private removeTaskFromView(taskId: number): void {
+    // Remover de las columnas del Kanban
+    this.columns.forEach(column => {
+      column.tasks = column.tasks.filter(t => t.id !== taskId);
+    });
+
+    // Remover de allTasks
+    this.allTasks = this.allTasks.filter(t => t.id !== taskId);
+    
+    // Actualizar paginación
+    this.updatePagination();
   }
 
   // Métodos de paginación

@@ -258,6 +258,8 @@
   transition: all 0.2s;
   color: #666;
   font-size: 15px;
+  height: auto;
+  width: auto;
 }
 
 .btn-action:hover {

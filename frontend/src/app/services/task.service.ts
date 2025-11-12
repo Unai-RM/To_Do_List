@@ -43,4 +43,19 @@ export class TaskService {
   updateTaskUsers(id: number, userIds: number[]): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/users`, { userIds }, { headers: this.getHeaders() });
   }
+
+  // Archivar tarea
+  archiveTask(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/archive`, {}, { headers: this.getHeaders() });
+  }
+
+  // Desarchivar tarea
+  unarchiveTask(id: number): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/unarchive`, {}, { headers: this.getHeaders() });
+  }
+
+  // Eliminar tarea (soft delete)
+  deleteTask(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  }
 }

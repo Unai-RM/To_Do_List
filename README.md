@@ -153,6 +153,12 @@ npx sequelize-cli db:seed:all
   - Tooltips con nombre completo al hacer hover
   - Gestión desde el panel de edición (agregar/quitar usuarios)
   - Actualización en tiempo real en Kanban y tabla
+- ✅ **Soft Delete y Archivado**:
+  - Archivar tareas (quedan ocultas pero recuperables)
+  - Eliminar tareas con soft delete (no se borran físicamente de la BD)
+  - Modal de confirmación personalizado con diseño moderno
+  - Botones de acción en tabla y panel de edición
+  - Tareas archivadas/eliminadas no aparecen en vistas activas
 - ✅ **Filtrado por rol**: Gestores y empresas ven todas las tareas de su compañía
 - ✅ **Información detallada**: Creador, fecha de creación y estado de cada tarea
 
@@ -162,7 +168,7 @@ npx sequelize-cli db:seed:all
 - ✅ **Agrupaciones de usuarios**: Sistema de grupos con relación many-to-many
 
 ### Interfaz y UX
-- ✅ **Modal de confirmación**: Confirmación antes de cerrar sesión
+- ✅ **Modales de confirmación**: Confirmación personalizada para cerrar sesión, archivar y eliminar
 - ✅ **Interfaz moderna**: Diseño con gradientes, animaciones y validaciones reactivas
 - ✅ **Estilos consistentes**: Botones, inputs y selectores unificados
 - ✅ **API REST completa**: Endpoints para autenticación, tareas y usuarios
@@ -176,7 +182,7 @@ npx sequelize-cli db:seed:all
 ## 🚧 Funcionalidades Pendientes
 
 - [ ] **Gestión de grupos**: Panel para asignar usuarios a grupos
-- [ ] **Eliminar tareas**: Botón y endpoint para eliminar
+- [ ] **Vista de tareas archivadas**: Sección para ver y recuperar tareas archivadas
 - [ ] **Diseño responsive**: Adaptar para móviles y tablets
 - [ ] **Mejoras de estilo**: Tema oscuro/claro, notificaciones toast
 - [ ] **Búsqueda y filtros**: Filtrar usuarios/tareas por diferentes criterios

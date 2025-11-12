@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -34,7 +39,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     tableName: 'tasks',
-    timestamps: true
+    timestamps: true,
+    paranoid: true
   });
 
   return Task;
