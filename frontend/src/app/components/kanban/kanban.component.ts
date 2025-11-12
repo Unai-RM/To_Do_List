@@ -4,6 +4,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { TaskService } from '../../services/task.service';
 import { Task, TaskStatus, TaskColumn } from '../../models/task.model';
 import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-kanban',
@@ -27,11 +28,25 @@ export class KanbanComponent implements OnInit {
   errorMessage: string = '';
   currentUser: any = null;
   editingTask: Task | null = null;
+  viewMode: 'kanban' | 'table' = 'kanban';
+  allTasks: Task[] = [];
+  
+  // Paginación
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  itemsPerPageOptions: number[] = [5, 10, 15, 20, 25];
+  paginatedTasks: Task[] = [];
+
+  // Gestión de usuarios asignados
+  selectedUsers: any[] = [];
+  availableUsers: any[] = [];
+  allCompanyUsers: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -39,6 +54,51 @@ export class KanbanComponent implements OnInit {
     this.initForm();
     this.initEditForm();
     this.loadTasks();
+    this.loadCompanyUsers();
+  }
+
+  loadCompanyUsers(): void {
+    this.userService.getAllUsers(this.currentUser?.id).subscribe({
+      next: (users: any[]) => {
+        this.allCompanyUsers = users.filter(u => u.role === 2 || u.role === 3); // Gestores y usuarios
+        this.updateAvailableUsers();
+      },
+      error: (error: any) => {
+        console.error('Error al cargar usuarios:', error);
+      }
+    });
+  }
+
+  updateAvailableUsers(): void {
+    const selectedIds = this.selectedUsers.map(u => u.id);
+    this.availableUsers = this.allCompanyUsers.filter(u => !selectedIds.includes(u.id));
+  }
+
+  addUser(event: any): void {
+    const userId = parseInt(event.target.value);
+    console.log('Intentando agregar usuario:', userId);
+    console.log('Usuarios disponibles:', this.allCompanyUsers);
+    
+    if (!userId) return;
+
+    const user = this.allCompanyUsers.find(u => u.id === userId);
+    console.log('Usuario encontrado:', user);
+    
+    if (user && !this.selectedUsers.find(u => u.id === userId)) {
+      this.selectedUsers.push(user);
+      console.log('Usuario agregado. Seleccionados:', this.selectedUsers);
+      this.updateAvailableUsers();
+    }
+    
+    // Reset select
+    event.target.value = '';
+  }
+
+  removeUser(userId: number): void {
+    console.log('Removiendo usuario:', userId);
+    this.selectedUsers = this.selectedUsers.filter(u => u.id !== userId);
+    console.log('Usuarios restantes:', this.selectedUsers);
+    this.updateAvailableUsers();
   }
 
   initForm(): void {
@@ -51,7 +111,8 @@ export class KanbanComponent implements OnInit {
   initEditForm(): void {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['']
+      description: [''],
+      status: [0, Validators.required]
     });
   }
 
@@ -72,6 +133,9 @@ export class KanbanComponent implements OnInit {
   }
 
   distributeTasks(tasks: Task[]): void {
+    // Guardar todas las tareas
+    this.allTasks = tasks;
+    
     // Limpiar columnas
     this.columns.forEach(col => col.tasks = []);
     
@@ -82,6 +146,9 @@ export class KanbanComponent implements OnInit {
         column.tasks.push(task);
       }
     });
+    
+    // Actualizar paginación
+    this.updatePagination();
   }
 
   openModal(): void {
@@ -168,8 +235,14 @@ export class KanbanComponent implements OnInit {
     this.editingTask = task;
     this.editForm.patchValue({
       title: task.title,
-      description: task.description
+      description: task.description,
+      status: task.status
     });
+    
+    // Cargar usuarios asignados
+    this.selectedUsers = task.assigned_users ? [...task.assigned_users] : [];
+    this.updateAvailableUsers();
+    
     this.showEditModal = true;
     this.errorMessage = '';
   }
@@ -191,14 +264,128 @@ export class KanbanComponent implements OnInit {
       description: this.editForm.value.description || ''
     };
 
+    const oldStatus = this.editingTask.status;
+    const newStatus = parseInt(this.editForm.value.status, 10);
+    
+    console.log('Actualizando tarea:', {
+      id: this.editingTask.id,
+      oldStatus,
+      newStatus,
+      statusChanged: oldStatus !== newStatus
+    });
+
     this.loading = true;
+
+    // Actualizar título y descripción
     this.taskService.updateTask(this.editingTask.id, updatedTask).subscribe({
       next: (task) => {
-        // Actualizar la tarea en la columna correspondiente
         this.editingTask!.title = task.title;
         this.editingTask!.description = task.description;
-        this.loading = false;
-        this.closeEditModal();
+
+        // Si el estado cambió, actualizar también el estado
+        if (oldStatus !== newStatus) {
+          this.taskService.updateTaskStatus(this.editingTask!.id, newStatus).subscribe({
+            next: () => {
+              console.log('Estado actualizado en backend, moviendo tarea...');
+              
+              // Guardar referencia a la tarea antes de moverla
+              const taskToMove = this.editingTask!;
+              
+              // Remover la tarea de la columna anterior
+              const oldColumn = this.columns.find(col => col.status === oldStatus);
+              if (oldColumn) {
+                const taskIndex = oldColumn.tasks.findIndex(t => t.id === taskToMove.id);
+                if (taskIndex > -1) {
+                  console.log(`Removiendo tarea de columna ${oldColumn.name}`);
+                  oldColumn.tasks.splice(taskIndex, 1);
+                }
+              }
+
+              // Actualizar el estado de la tarea
+              taskToMove.status = newStatus;
+              taskToMove.title = task.title;
+              taskToMove.description = task.description;
+
+              // Agregar la tarea a la nueva columna
+              const newColumn = this.columns.find(col => col.status === newStatus);
+              if (newColumn) {
+                console.log(`Agregando tarea a columna ${newColumn.name}`);
+                newColumn.tasks.push(taskToMove);
+              }
+
+              // Actualizar también en allTasks
+              const taskInAllTasks = this.allTasks.find(t => t.id === taskToMove.id);
+              if (taskInAllTasks) {
+                taskInAllTasks.status = newStatus;
+                taskInAllTasks.title = task.title;
+                taskInAllTasks.description = task.description;
+              }
+
+              // Actualizar usuarios asignados
+              const userIds = this.selectedUsers.map(u => u.id);
+              this.taskService.updateTaskUsers(this.editingTask!.id, userIds).subscribe({
+                next: () => {
+                  console.log('Usuarios actualizados correctamente');
+                  taskToMove.assigned_users = [...this.selectedUsers];
+                  
+                  // Actualizar en allTasks
+                  if (taskInAllTasks) {
+                    taskInAllTasks.assigned_users = [...this.selectedUsers];
+                  }
+                  
+                  this.updatePagination();
+                  this.loading = false;
+                  this.closeEditModal();
+                },
+                error: (error) => {
+                  console.error('Error al actualizar usuarios:', error);
+                  this.updatePagination();
+                  this.loading = false;
+                  this.closeEditModal();
+                }
+              });
+            },
+            error: (error) => {
+              console.error('Error al actualizar estado:', error);
+              this.errorMessage = 'Error al actualizar el estado de la tarea';
+              this.loading = false;
+            }
+          });
+        } else {
+          // Si no cambió el estado, solo actualizar título, descripción y usuarios
+          this.editingTask!.title = task.title;
+          this.editingTask!.description = task.description;
+          
+          // Actualizar también en allTasks
+          const taskInAllTasks = this.allTasks.find(t => t.id === this.editingTask!.id);
+          if (taskInAllTasks) {
+            taskInAllTasks.title = task.title;
+            taskInAllTasks.description = task.description;
+          }
+          
+          // Actualizar usuarios asignados
+          const userIds = this.selectedUsers.map(u => u.id);
+          this.taskService.updateTaskUsers(this.editingTask!.id, userIds).subscribe({
+            next: () => {
+              console.log('Usuarios actualizados correctamente');
+              this.editingTask!.assigned_users = [...this.selectedUsers];
+              
+              if (taskInAllTasks) {
+                taskInAllTasks.assigned_users = [...this.selectedUsers];
+              }
+              
+              this.updatePagination();
+              this.loading = false;
+              this.closeEditModal();
+            },
+            error: (error) => {
+              console.error('Error al actualizar usuarios:', error);
+              this.updatePagination();
+              this.loading = false;
+              this.closeEditModal();
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Error al actualizar tarea:', error);
@@ -210,6 +397,82 @@ export class KanbanComponent implements OnInit {
 
   getColumnIds(): string[] {
     return this.columns.map((_, index) => `column-${index}`);
+  }
+
+  formatDate(dateString: string | undefined): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    // Comparar solo las fechas (sin horas)
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const diffTime = nowOnly.getTime() - dateOnly.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return 'Hoy';
+    } else if (diffDays === 1) {
+      return 'Ayer';
+    } else if (diffDays < 7) {
+      return `Hace ${diffDays} días`;
+    } else {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+  }
+
+  setViewMode(mode: 'kanban' | 'table'): void {
+    this.viewMode = mode;
+  }
+
+  getStatusName(status: TaskStatus): string {
+    const statusNames: { [key: number]: string } = {
+      [TaskStatus.BACKLOG]: 'Backlog',
+      [TaskStatus.TODO]: 'To Do',
+      [TaskStatus.DOING]: 'Doing',
+      [TaskStatus.TESTING]: 'Testing',
+      [TaskStatus.DONE]: 'Done'
+    };
+    return statusNames[status] || 'Desconocido';
+  }
+
+  getInitials(name: string, surname: string): string {
+    const firstInitial = name ? name.charAt(0).toUpperCase() : '';
+    const lastInitial = surname ? surname.charAt(0).toUpperCase() : '';
+    return firstInitial + lastInitial;
+  }
+
+  // Métodos de paginación
+  updatePagination(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedTasks = this.allTasks.slice(startIndex, endIndex);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.allTasks.length / this.itemsPerPage);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  onItemsPerPageChange(event: any): void {
+    this.itemsPerPage = parseInt(event.target.value, 10);
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   get title() { return this.taskForm.get('title'); }

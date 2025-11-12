@@ -4,8 +4,16 @@ export interface Task {
   description: string;
   status: TaskStatus;
   id_user_creator: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  creator_name?: string;
+  assigned_users?: AssignedUser[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AssignedUser {
+  id: number;
+  name: string;
+  surname: string;
 }
 
 export enum TaskStatus {

@@ -1,14 +1,31 @@
 <div class="kanban-container">
   <div class="kanban-header">
-    <h1>Tablero Kanban</h1>
+    <h1>Gestión de Tareas</h1>
     <div class="header-actions">
+      <div class="view-toggle">
+        <button 
+          class="toggle-btn" 
+          [class.active]="viewMode === 'kanban'"
+          (click)="setViewMode('kanban')"
+        >
+          <i class="fas fa-columns"></i> Kanban
+        </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="viewMode === 'table'"
+          (click)="setViewMode('table')"
+        >
+          <i class="fas fa-table"></i> Tabla
+        </button>
+      </div>
       <button class="btn-add-task" (click)="openModal()">
         + Nueva Tarea
       </button>
     </div>
   </div>
 
-  <div class="kanban-board" cdkDropListGroup>
+  <!-- Vista Kanban -->
+  <div *ngIf="viewMode === 'kanban'" class="kanban-board" cdkDropListGroup>
     <div 
       *ngFor="let column of columns; let i = index" 
       class="kanban-column"
@@ -37,8 +54,27 @@
             <h3>{{ task.title }}</h3>
           </div>
           <p *ngIf="task.description" class="task-description">{{ task.description }}</p>
+          <div class="task-assigned" *ngIf="task.assigned_users && task.assigned_users.length > 0">
+            <div class="avatars-group-small">
+              <div 
+                *ngFor="let user of task.assigned_users?.slice(0, 3)" 
+                class="avatar-small"
+                [title]="user.name + ' ' + user.surname"
+              >
+                {{ getInitials(user.name, user.surname) }}
+              </div>
+              <div 
+                *ngIf="task.assigned_users.length > 3" 
+                class="avatar-small avatar-more-small"
+                [title]="'Y ' + (task.assigned_users.length - 3) + ' más'"
+              >
+                +{{ task.assigned_users.length - 3 }}
+              </div>
+            </div>
+          </div>
           <div class="task-footer">
-            <span class="task-id">#{{ task.id }}</span>
+            <span class="task-creator">{{ task.creator_name || 'Sin asignar' }}</span>
+            <span class="task-date">{{ formatDate(task.createdAt) }}</span>
           </div>
         </div>
 
@@ -47,6 +83,114 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Vista Tabla -->
+  <div *ngIf="viewMode === 'table'" class="table-view">
+    <table class="tasks-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Asignados</th>
+          <th>Creador</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of paginatedTasks" (click)="openEditModal(task)" class="task-row">
+          <td class="task-title">{{ task.title }}</td>
+          <td class="task-desc">{{ task.description || '-' }}</td>
+          <td>
+            <span class="status-badge" [attr.data-status]="task.status">
+              {{ getStatusName(task.status) }}
+            </span>
+          </td>
+          <td class="task-assigned-cell">
+            <div class="avatars-group">
+              <div 
+                *ngFor="let user of task.assigned_users?.slice(0, 3); let i = index" 
+                class="avatar"
+                [title]="user.name + ' ' + user.surname"
+              >
+                {{ getInitials(user.name, user.surname) }}
+              </div>
+              <div 
+                *ngIf="task.assigned_users && task.assigned_users.length > 3" 
+                class="avatar avatar-more"
+                [title]="'Y ' + (task.assigned_users.length - 3) + ' más'"
+              >
+                +{{ task.assigned_users.length - 3 }}
+              </div>
+              <span *ngIf="!task.assigned_users || task.assigned_users.length === 0" class="no-assigned">
+                Sin asignar
+              </span>
+            </div>
+          </td>
+          <td class="task-creator-cell">{{ task.creator_name || 'Sin asignar' }}</td>
+          <td class="task-date-cell">{{ formatDate(task.createdAt) }}</td>
+          <td class="task-actions" (click)="$event.stopPropagation()">
+            <button class="btn-action btn-edit" (click)="openEditModal(task)" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="allTasks.length === 0">
+          <td colspan="7" class="no-tasks">No hay tareas disponibles</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="7" class="table-footer">
+            <div class="footer-content">
+              <div class="total-count">
+                Total: {{ allTasks.length }} {{ allTasks.length === 1 ? 'tarea' : 'tareas' }}
+              </div>
+              <div class="pagination-controls" *ngIf="allTasks.length > 0">
+                <div class="items-per-page">
+                  <label for="itemsPerPage">Mostrar:</label>
+                  <select 
+                    id="itemsPerPage" 
+                    [value]="itemsPerPage" 
+                    (change)="onItemsPerPageChange($event)"
+                    class="items-select"
+                  >
+                    <option *ngFor="let option of itemsPerPageOptions" [value]="option">
+                      {{ option }}
+                    </option>
+                  </select>
+                </div>
+                <div class="pagination">
+                  <button 
+                    class="pagination-btn" 
+                    (click)="previousPage()" 
+                    [disabled]="currentPage === 1"
+                    title="Página anterior"
+                  >
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  
+                  <span class="page-info">
+                    Página {{ currentPage }} de {{ totalPages }}
+                  </span>
+                  
+                  <button 
+                    class="pagination-btn" 
+                    (click)="nextPage()" 
+                    [disabled]="currentPage === totalPages"
+                    title="Página siguiente"
+                  >
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 </div>
 
@@ -106,21 +250,28 @@
   </div>
 </div>
 
-<!-- Modal para editar tarea -->
-<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Editar Tarea</h2>
-      <button class="btn-close" (click)="closeEditModal()">×</button>
+<!-- Sidebar para editar tarea -->
+<div class="sidebar-overlay" *ngIf="showEditModal" (click)="closeEditModal()"></div>
+<div class="sidebar-panel" [class.open]="showEditModal">
+  <div class="sidebar-header">
+    <div class="header-content">
+      <h2><i class="fas fa-edit"></i> Editar Tarea</h2>
     </div>
+    <button class="btn-close-sidebar" (click)="closeEditModal()" title="Cerrar">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 
+  <div class="sidebar-body">
     <div *ngIf="errorMessage" class="alert alert-error">
       {{ errorMessage }}
     </div>
 
     <form [formGroup]="editForm" (ngSubmit)="onEditSubmit()">
-      <div class="form-group">
-        <label for="editTitle">Título *</label>
+      <div class="form-section">
+        <label for="editTitle" class="form-label">
+          <i class="fas fa-heading"></i> Título *
+        </label>
         <input 
           type="text" 
           id="editTitle" 
@@ -135,27 +286,109 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="editDescription">Descripción</label>
+      <div class="form-section">
+        <label for="editDescription" class="form-label">
+          <i class="fas fa-align-left"></i> Descripción
+        </label>
         <textarea 
           id="editDescription" 
           formControlName="description" 
           class="form-control"
-          rows="4"
-          placeholder="Descripción de la tarea (opcional)"
+          rows="8"
+          placeholder="Descripción detallada de la tarea (opcional)"
         ></textarea>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeEditModal()">
-          Cancelar
+      <div class="form-section">
+        <label for="editStatus" class="form-label">
+          <i class="fas fa-tasks"></i> Estado
+        </label>
+        <select 
+          id="editStatus" 
+          formControlName="status" 
+          class="form-control form-select"
+        >
+          <option [value]="0">Backlog</option>
+          <option [value]="1">To Do</option>
+          <option [value]="2">Doing</option>
+          <option [value]="3">Testing</option>
+          <option [value]="4">Done</option>
+        </select>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">
+          <i class="fas fa-users"></i> Usuarios Asignados
+        </label>
+        <div class="assigned-users-section">
+          <div class="assigned-users-list" *ngIf="selectedUsers.length > 0">
+            <div 
+              *ngFor="let user of selectedUsers" 
+              class="assigned-user-item"
+            >
+              <div class="user-info">
+                <div class="avatar-small">
+                  {{ getInitials(user.name, user.surname) }}
+                </div>
+                <span class="user-name">{{ user.name }} {{ user.surname }}</span>
+              </div>
+              <button 
+                type="button" 
+                class="btn-remove-user" 
+                (click)="removeUser(user.id)"
+                title="Quitar usuario"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="add-user-section">
+            <select 
+              class="form-control form-select"
+              (change)="addUser($event)"
+              [value]="''"
+            >
+              <option value="" disabled>Seleccionar usuario...</option>
+              <option 
+                *ngFor="let user of availableUsers" 
+                [value]="user.id"
+              >
+                {{ user.name }} {{ user.surname }}
+              </option>
+            </select>
+          </div>
+          <p class="help-text" *ngIf="selectedUsers.length === 0">
+            No hay usuarios asignados a esta tarea
+          </p>
+        </div>
+      </div>
+
+      <div class="form-section" *ngIf="editingTask">
+        <label class="form-label">
+          <i class="fas fa-info-circle"></i> Información
+        </label>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Creador:</span>
+            <span class="info-value">{{ editingTask.creator_name || 'Sin asignar' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Creada:</span>
+            <span class="info-value">{{ formatDate(editingTask.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button type="button" class="btn-cancel" (click)="closeEditModal()">
+          <i class="fas fa-times"></i> Cancelar
         </button>
         <button 
           type="submit" 
-          class="btn-primary" 
+          class="btn-save" 
           [disabled]="editForm.invalid || loading"
         >
-          {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
+          <i class="fas fa-check"></i> {{ loading ? 'Guardando...' : 'Guardar Cambios' }}
         </button>
       </div>
     </form>

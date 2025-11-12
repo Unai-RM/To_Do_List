@@ -19,7 +19,6 @@
     <table *ngIf="!loading || users.length > 0" class="data-table">
       <thead>
         <tr>
-          <th>ID</th>
           <th *ngIf="currentUser?.role === 0">Empresa</th>
           <th>Nick</th>
           <th>Nombre</th>
@@ -30,11 +29,10 @@
       </thead>
       <tbody>
         <tr *ngFor="let user of paginatedUsers">
-          <td>{{ user.id }}</td>
           <td *ngIf="currentUser?.role === 0">
             <span class="company-name">{{ user.company_display || 'N/A' }}</span>
           </td>
-          <td>{{ user.nick }}</td>
+          <td><span class="user-nick">{{ user.nick }}</span></td>
           <td>{{ user.name }}</td>
           <td>{{ user.surname }}</td>
           <td>

@@ -38,4 +38,9 @@ export class TaskService {
   updateTaskStatus(id: number, status: TaskStatus): Observable<Task> {
     return this.http.patch<Task>(`${this.apiUrl}/${id}/status`, { status }, { headers: this.getHeaders() });
   }
+
+  // Actualizar usuarios asignados a una tarea
+  updateTaskUsers(id: number, userIds: number[]): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/users`, { userIds }, { headers: this.getHeaders() });
+  }
 }

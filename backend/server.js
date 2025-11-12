@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const userRoutes = require('./routes/users');
+const databaseRoutes = require('./routes/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,9 @@ app.use('/api/tasks', taskRoutes);
 
 // Rutas de usuarios
 app.use('/api/users', userRoutes);
+
+// Rutas de base de datos (limpieza y reset)
+app.use('/api/database', databaseRoutes);
 
 // Iniciar servidor
 app.listen(PORT, () => {
