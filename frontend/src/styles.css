@@ -11,3 +11,41 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Estilos para botones con gradiente en tema claro */
+.theme-light .btn-add-task,
+.theme-light .btn-add,
+.theme-light .btn-primary,
+.theme-light .btn-edit,
+.theme-light .btn-save-user,
+.theme-light .btn-save {
+  color: #2d3748 !important;
+}
+
+/* Estilos para avatares en tema claro */
+.theme-light .avatar,
+.theme-light .avatar-small {
+  color: #2d3748 !important;
+}
+
+/* Estilos para sidebar en tema claro */
+.theme-light .sidebar {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar h2 {
+  background: linear-gradient(to right, #2d3748, #4a5568) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.theme-light .sidebar .user-name,
+.theme-light .sidebar .user-role,
+.theme-light .sidebar .menu-item,
+.theme-light .sidebar .menu-label,
+.theme-light .sidebar .menu-icon,
+.theme-light .sidebar i,
+.theme-light .sidebar span {
+  color: #2d3748 !important;
+}

@@ -1,7 +1,8 @@
 .kanban-container {
   padding: 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  transition: background 0.5s ease;
 }
 
 .kanban-header {
@@ -29,7 +30,7 @@
 
 .btn-add-task {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   border: none;
   border-radius: 8px;
@@ -131,7 +132,17 @@
 }
 
 .kanban-column[data-status="1"] .column-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+}
+
+/* Tema claro - texto oscuro en columna "En Progreso" */
+.theme-light .kanban-column[data-status="1"] .column-header {
+  color: #2d3748;
+}
+
+.theme-light .kanban-column[data-status="1"] .task-count {
+  background: rgba(45, 55, 72, 0.2);
+  color: #2d3748;
 }
 
 .kanban-column[data-status="2"] .column-header {
@@ -263,7 +274,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   display: flex;
   align-items: center;
@@ -787,7 +798,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   display: flex;
   align-items: center;
@@ -906,13 +917,33 @@
 }
 
 .sidebar-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   padding: 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: color 0.3s ease;
+}
+
+/* Tema claro - texto oscuro en sidebar-header */
+.theme-light .sidebar-header {
+  color: #2d3748;
+  border-bottom: 1px solid rgba(45, 55, 72, 0.1);
+}
+
+.theme-light .sidebar-header .subtitle {
+  color: rgba(45, 55, 72, 0.8);
+}
+
+.theme-light .btn-close-sidebar {
+  background: rgba(45, 55, 72, 0.2);
+  color: #2d3748;
+}
+
+.theme-light .btn-close-sidebar:hover {
+  background: rgba(45, 55, 72, 0.3);
 }
 
 .header-content h2 {
@@ -1127,7 +1158,7 @@
 
 .btn-save {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   border: none;
   border-radius: 8px;

@@ -1,7 +1,8 @@
 .users-container {
   padding: 20px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  transition: background 0.5s ease;
 }
 
 .page-header {
@@ -27,7 +28,7 @@
   align-items: center;
   gap: 8px;
   padding: 11px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
   border: none;
   border-radius: 8px;
@@ -453,7 +454,7 @@ form {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
   color: white;
 }
 

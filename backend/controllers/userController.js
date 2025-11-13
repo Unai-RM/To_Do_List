@@ -292,6 +292,95 @@ const userController = {
         error: error.message 
       });
     }
+  },
+
+  // Cambiar contraseña
+  async changePassword(req, res) {
+    try {
+      const { id } = req.params;
+      const { currentPassword, newPassword } = req.body;
+
+      // Validar campos requeridos
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ 
+          message: 'La contraseña actual y la nueva contraseña son requeridas' 
+        });
+      }
+
+      // Validar longitud mínima de la nueva contraseña
+      if (newPassword.length < 6) {
+        return res.status(400).json({ 
+          message: 'La nueva contraseña debe tener al menos 6 caracteres' 
+        });
+      }
+
+      // Buscar usuario
+      const user = await User.findByPk(id);
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+
+      // Verificar contraseña actual
+      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: 'La contraseña actual es incorrecta' });
+      }
+
+      // Encriptar nueva contraseña
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // Actualizar contraseña
+      await user.update({
+        password: hashedPassword,
+        updatedAt: new Date()
+      });
+
+      res.json({ message: 'Contraseña actualizada exitosamente' });
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
+      res.status(500).json({ 
+        message: 'Error al cambiar contraseña',
+        error: error.message 
+      });
+    }
+  },
+
+  // Actualizar preferencias de notificaciones
+  async updateNotificationPreferences(req, res) {
+    try {
+      const { id } = req.params;
+      const { notifications_enabled } = req.body;
+
+      // Validar que se proporcione el campo
+      if (notifications_enabled === undefined) {
+        return res.status(400).json({ 
+          message: 'El campo notifications_enabled es requerido' 
+        });
+      }
+
+      // Buscar usuario
+      const user = await User.findByPk(id);
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+
+      // Actualizar preferencias
+      await user.update({
+        notifications_enabled: notifications_enabled,
+        updatedAt: new Date()
+      });
+
+      res.json({ 
+        message: 'Preferencias de notificaciones actualizadas exitosamente',
+        notifications_enabled: user.notifications_enabled
+      });
+    } catch (error) {
+      console.error('Error al actualizar preferencias:', error);
+      res.status(500).json({ 
+        message: 'Error al actualizar preferencias',
+        error: error.message 
+      });
+    }
   }
 };
 

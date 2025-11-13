@@ -33,6 +33,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       comment: 'ID of the company the user belongs to'
     },
+    notifications_enabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      comment: 'Indica si el usuario tiene las notificaciones activadas'
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: false,

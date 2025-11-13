@@ -167,10 +167,26 @@ npx sequelize-cli db:seed:all
 - ✅ **Tabla con paginación**: Sistema de paginación con navegación y selector de items por página (5, 10, 15, 20, 25)
 - ✅ **Agrupaciones de usuarios**: Sistema de grupos con relación many-to-many
 
+### Configuración y Personalización
+- ✅ **Sistema de temas**: 10 gradientes predefinidos para personalizar la apariencia
+  - Púrpura Místico, Océano Profundo, Atardecer Cálido, Bosque Esmeralda
+  - Fuego Ardiente, Noche Estrellada, Dulce Caramelo, Realeza Dorada
+  - Aurora Boreal, Melocotón Suave
+- ✅ **Persistencia con cookies**: El tema seleccionado se guarda automáticamente (365 días)
+- ✅ **Aplicación global**: El tema se aplica en todos los componentes (Kanban, Login, Register, Users, Settings, Sidebar)
+- ✅ **Colores adaptativos**: Texto blanco/negro automático según luminosidad del tema
+- ✅ **Transiciones suaves**: Cambios de tema con animaciones de 0.5s
+- ✅ **Configuración de usuario**: Editar datos personales (nick, nombre, apellidos)
+- ✅ **Cambio de contraseña**: Modal para cambiar contraseña con validaciones de seguridad
+- ✅ **Panel dividido**: Configuración de aplicación y configuración de usuario en dos columnas separadas
+- ✅ **Validaciones en tiempo real**: Formularios con validación reactiva
+- ✅ **Actualización de perfil**: Los cambios se guardan en BD y localStorage
+
 ### Interfaz y UX
 - ✅ **Modales de confirmación**: Confirmación personalizada para cerrar sesión, archivar y eliminar
-- ✅ **Interfaz moderna**: Diseño con gradientes, animaciones y validaciones reactivas
-- ✅ **Estilos consistentes**: Botones, inputs y selectores unificados
+- ✅ **Interfaz moderna**: Diseño con gradientes personalizables, animaciones y validaciones reactivas
+- ✅ **Estilos consistentes**: Botones, inputs y selectores unificados con tema dinámico
+- ✅ **Diseño responsive**: Grid adaptativo en configuración (2 columnas → 1 columna en móvil)
 - ✅ **API REST completa**: Endpoints para autenticación, tareas y usuarios
 
 ### Accesos por Rol:
@@ -183,8 +199,8 @@ npx sequelize-cli db:seed:all
 
 - [ ] **Gestión de grupos**: Panel para asignar usuarios a grupos
 - [ ] **Vista de tareas archivadas**: Sección para ver y recuperar tareas archivadas
-- [ ] **Diseño responsive**: Adaptar para móviles y tablets
-- [ ] **Mejoras de estilo**: Tema oscuro/claro, notificaciones toast
 - [ ] **Búsqueda y filtros**: Filtrar usuarios/tareas por diferentes criterios
 - [ ] **Exportación de datos**: Exportar listados a CSV/Excel
-- [ ] **Notificaciones**: Sistema de notificaciones para tareas asignadas
+- [ ] **Sistema de notificaciones**: Envío de notificaciones (email/push) cuando se asignan tareas
+- [ ] **Foto de perfil**: Permitir subir y gestionar foto de perfil de usuario
+- [ ] **Añadir idiomas**: Posibilidad de cambiar de idioma

@@ -1,13 +1,243 @@
 <div class="settings-container">
+  <!-- Header con fondo blanco -->
   <div class="page-header">
     <h1>Configuración</h1>
-    <p>Personaliza tu experiencia</p>
   </div>
 
-  <div class="content-placeholder">
-    <div class="placeholder-icon">⚙️</div>
-    <h2>Panel de Configuración</h2>
-    <p>Aquí podrás configurar preferencias del sistema, perfil de usuario y más.</p>
-    <p class="text-muted">Funcionalidad en desarrollo...</p>
+  <!-- Contenedor principal dividido en dos columnas -->
+  <div class="settings-wrapper">
+    <!-- Columna izquierda: Configuración de Aplicación -->
+    <div class="settings-card">
+      
+      <!-- Columna izquierda: Configuración de Aplicación -->
+      <div class="settings-column">
+        <h2 class="column-title">Configuración de Aplicación</h2>
+        
+        <!-- Notificaciones (solo para usuarios que no sean superadmin) -->
+        <ng-container *ngIf="currentUser?.role !== 0">
+          <div class="notification-setting">
+            <div class="setting-info">
+              <label class="setting-label">Notificaciones de Tareas</label>
+              <p class="setting-description">Recibe notificaciones cuando te asignen a una tarea</p>
+            </div>
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                [checked]="notificationsEnabled"
+                (change)="toggleNotifications()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <!-- Separador -->
+          <div class="setting-divider"></div>
+        </ng-container>
+        
+        <div class="theme-selector-container">
+          <label class="setting-label">Tema de Color</label>
+          
+          <div class="current-theme-display" (click)="toggleThemeSelector()">
+            <div class="theme-preview" [style.background]="currentTheme?.gradient"></div>
+            <div class="theme-info">
+              <span class="theme-name">{{ currentTheme?.name }}</span>
+              <span class="theme-hint">Click para cambiar</span>
+            </div>
+            <span class="dropdown-icon">{{ showThemeSelector ? '▲' : '▼' }}</span>
+          </div>
+
+          <!-- Selector de temas desplegable -->
+          <div class="theme-options" *ngIf="showThemeSelector">
+            <div class="theme-grid">
+              <div 
+                *ngFor="let theme of themes" 
+                class="theme-option"
+                [class.selected]="theme.id === currentTheme?.id"
+                (click)="selectTheme(theme.id)">
+                <div class="theme-option-preview" [style.background]="theme.preview"></div>
+                <span class="theme-option-name">{{ theme.name }}</span>
+                <span class="check-icon" *ngIf="theme.id === currentTheme?.id">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Configuración de Usuario -->
+    <div class="settings-card">
+      <div class="settings-column">
+        <h2 class="column-title">Configuración de Usuario</h2>
+        
+        <!-- Alertas -->
+        <div class="alert alert-success" *ngIf="successMessage">
+          {{ successMessage }}
+        </div>
+        <div class="alert alert-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="userForm" (ngSubmit)="saveUserChanges()">
+          <div class="form-group">
+            <label>Nick de Usuario</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="nick"
+              [class.invalid]="nick?.invalid && nick?.touched"
+              [readonly]="!isEditingUser">
+            <div class="error-message" *ngIf="nick?.invalid && nick?.touched">
+              <span *ngIf="nick?.errors?.['required']">El nick es requerido</span>
+              <span *ngIf="nick?.errors?.['minlength']">El nick debe tener al menos 3 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="nombre"
+              [class.invalid]="nombre?.invalid && nombre?.touched"
+              [readonly]="!isEditingUser">
+            <div class="error-message" *ngIf="nombre?.invalid && nombre?.touched">
+              <span *ngIf="nombre?.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="nombre?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="apellidos"
+              [class.invalid]="apellidos?.invalid && apellidos?.touched"
+              [readonly]="!isEditingUser">
+            <div class="error-message" *ngIf="apellidos?.invalid && apellidos?.touched">
+              <span *ngIf="apellidos?.errors?.['required']">Los apellidos son requeridos</span>
+              <span *ngIf="apellidos?.errors?.['minlength']">Los apellidos deben tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <div class="actions-left" *ngIf="!isEditingUser">
+              <button 
+                type="button" 
+                class="btn-password" 
+                (click)="enablePasswordChange()">
+                Cambiar Contraseña
+              </button>
+            </div>
+            
+            <div class="actions-right">
+              <button 
+                type="button" 
+                class="btn-edit" 
+                *ngIf="!isEditingUser"
+                (click)="enableUserEdit()">
+                Editar Datos
+              </button>
+              
+              <div class="edit-actions" *ngIf="isEditingUser">
+                <button 
+                  type="button" 
+                  class="btn-cancel" 
+                  (click)="cancelUserEdit()">
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  class="btn-save-user"
+                  [disabled]="userForm.invalid">
+                  Guardar Cambios
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Modal de Cambio de Contraseña -->
+<div class="modal-overlay" *ngIf="isChangingPassword" (click)="cancelPasswordChange()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Cambiar Contraseña</h3>
+      <button class="btn-close" (click)="cancelPasswordChange()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Alertas de contraseña -->
+      <div class="alert alert-success" *ngIf="passwordSuccessMessage">
+        {{ passwordSuccessMessage }}
+      </div>
+      <div class="alert alert-error" *ngIf="passwordErrorMessage">
+        {{ passwordErrorMessage }}
+      </div>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <div class="form-group">
+          <label>Contraseña Actual</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            formControlName="currentPassword"
+            [class.invalid]="currentPassword?.invalid && currentPassword?.touched"
+            placeholder="Ingresa tu contraseña actual">
+          <div class="error-message" *ngIf="currentPassword?.invalid && currentPassword?.touched">
+            <span *ngIf="currentPassword?.errors?.['required']">La contraseña actual es requerida</span>
+            <span *ngIf="currentPassword?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Nueva Contraseña</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            formControlName="newPassword"
+            [class.invalid]="newPassword?.invalid && newPassword?.touched"
+            placeholder="Ingresa tu nueva contraseña">
+          <div class="error-message" *ngIf="newPassword?.invalid && newPassword?.touched">
+            <span *ngIf="newPassword?.errors?.['required']">La nueva contraseña es requerida</span>
+            <span *ngIf="newPassword?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar Nueva Contraseña</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            formControlName="confirmPassword"
+            [class.invalid]="confirmPassword?.invalid && confirmPassword?.touched"
+            placeholder="Confirma tu nueva contraseña">
+          <div class="error-message" *ngIf="confirmPassword?.invalid && confirmPassword?.touched">
+            <span *ngIf="confirmPassword?.errors?.['required']">Debes confirmar la contraseña</span>
+            <span *ngIf="confirmPassword?.errors?.['minlength']">Debe tener al menos 6 caracteres</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn-cancel" 
+            (click)="cancelPasswordChange()">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-save-user"
+            [disabled]="passwordForm.invalid">
+            Cambiar Contraseña
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay para cerrar el selector -->
+<div class="theme-overlay" *ngIf="showThemeSelector" (click)="closeThemeSelector()"></div>

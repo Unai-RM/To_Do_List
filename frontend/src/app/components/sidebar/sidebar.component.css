@@ -4,7 +4,8 @@
   top: 0;
   width: 260px;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  transition: background 0.5s ease, color 0.3s ease;
   color: white;
   display: flex;
   flex-direction: column;
@@ -12,9 +13,75 @@
   z-index: 1000;
 }
 
+/* Tema claro - texto oscuro */
+.theme-light .sidebar {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .user-name {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .user-role {
+  color: rgba(45, 55, 72, 0.7) !important;
+}
+
+.theme-light .sidebar .menu-item {
+  color: rgba(45, 55, 72, 0.8) !important;
+}
+
+.theme-light .sidebar .menu-item:hover {
+  background: rgba(45, 55, 72, 0.1) !important;
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-item.active {
+  background: rgba(45, 55, 72, 0.2) !important;
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-icon {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-label {
+  color: rgba(45, 55, 72, 0.8) !important;
+}
+
+.theme-light .sidebar .menu-item span {
+  color: rgba(45, 55, 72, 0.8) !important;
+}
+
+.theme-light .sidebar .menu-item i {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-item:hover .menu-label,
+.theme-light .sidebar .menu-item:hover span {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-item:hover i {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-item.active .menu-label,
+.theme-light .sidebar .menu-item.active span {
+  color: #2d3748 !important;
+}
+
+.theme-light .sidebar .menu-item.active i {
+  color: #2d3748 !important;
+}
+
 .sidebar-header {
   padding: 30px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.theme-light .sidebar-header {
+  border-bottom: 1px solid rgba(45, 55, 72, 0.1);
 }
 
 .sidebar-header h2 {
@@ -22,6 +89,13 @@
   font-size: 24px;
   font-weight: 700;
   background: linear-gradient(to right, #fff, #e0e7ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.theme-light .sidebar-header h2 {
+  background: linear-gradient(to right, #2d3748, #4a5568);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

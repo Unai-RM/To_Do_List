@@ -68,4 +68,18 @@ export class UserService {
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
   }
+
+  changePassword(id: number, currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/change-password`, 
+      { currentPassword, newPassword }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateNotificationPreferences(id: number, notifications_enabled: boolean): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/notifications`, 
+      { notifications_enabled }, 
+      { headers: this.getHeaders() }
+    );
+  }
 }
